@@ -1,0 +1,101 @@
+server:
+  address: 0.0.0.0
+  port: 9102
+  servlet:
+    context-path: /SignServer
+
+spring:
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    password:
+  jta:
+    enabled: true
+    atomikos:
+      properties:
+        default-jta-timeout: 60000ms
+  datasource:
+    charge:
+      unique-resource-name: chargeDataSource
+      xa-data-source-class-name: com.microsoft.sqlserver.jdbc.SQLServerXADataSource
+      xa-properties:
+        URL: jdbc:sqlserver://localhost:1433;DatabaseName=Charges
+        user: sa
+        password: Charge123
+      maxActive: 100
+      initialSize: 10
+      maxWait: 60000
+      minIdle: 10
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 1
+      testWhileIdle: true
+      testOnBorrow: true
+      testOnReturn: true
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 20
+      idleTimeout: 600000
+      maxLifetime: 1800000
+    sign:
+      unique-resource-name: signDataSource
+      xa-data-source-class-name: com.mysql.jdbc.jdbc2.optional.MysqlXADataSource
+      xa-properties:
+        url: jdbc:mysql://127.0.0.1:3306/sign?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowMultiQueries=true&autoReconnect=true
+        user: root
+        password: root
+      maxActive: 100
+      initialSize: 10
+      maxWait: 60000
+      minIdle: 10
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 1
+      testWhileIdle: true
+      testOnBorrow: true
+      testOnReturn: true
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 100
+      idleTimeout: 600000
+      maxLifetime: 1800000
+    log:
+      unique-resource-name: logDataSource
+      xa-data-source-class-name: com.mysql.jdbc.jdbc2.optional.MysqlXADataSource
+      xa-properties:
+        url: jdbc:mysql://127.0.0.1:3306/sign_log?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&allowMultiQueries=true&autoReconnect=true
+        user: root
+        password: root
+      maxActive: 100
+      initialSize: 10
+      maxWait: 60000
+      minIdle: 10
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: select 1
+      testWhileIdle: true
+      testOnBorrow: true
+      testOnReturn: true
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 100
+      idleTimeout: 600000
+      maxLifetime: 1800000
+
+
+domain: http://baoming.gxgj.com
+
+wkhtmlurl: d:\Program Files\wkhtmltopdf\bin\wkhtmltoimage.exe
+
+noticeFileUrl: D:\upload\notice\
+
+importStudentUrl: D:\upload\import
+
+mysqlHost: 192.168.1.119
+
+signDataSourceBackUp: cmd /c ${mysqlBin}mysqldump --default-character-set=utf8mb4 -h${mysqlHost} -u${spring.datasource.sign.xa-properties.user} -p${spring.datasource.sign.xa-properties.password} sign >${signDataSourceBackUpUrl}
+
+mysqlBin: C:\xampp\mysql\bin\
+
+signDataSourceBackUpUrl: D:\upload\backup\
+
+dormKey: guilinjiapeng
+

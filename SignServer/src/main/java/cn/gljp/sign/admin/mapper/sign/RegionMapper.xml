@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.sign.RegionMapper" >
+    <resultMap id="BaseResultMap" type="cn.gljp.sign.admin.entity.Region">
+        <id column="code" jdbcType="INTEGER" property="code"/>
+        <result column="father_code" jdbcType="INTEGER" property="fatherCode"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="full_name" jdbcType="VARCHAR" property="fullName"/>
+        <result column="sort" jdbcType="INTEGER" property="sort"/>
+    </resultMap>
+
+    <select id="listByFatherCode"  parameterType="Integer" resultMap="BaseResultMap">
+       SELECT * from base_region where father_code = #{fatherCode}
+       order by sort asc,code asc
+   </select>
+    <insert id="insert" parameterType="cn.gljp.sign.admin.entity.Region">
+      insert into base_region (code, father_code, `type`,
+      name, full_name, sort
+      )
+    values (#{code,jdbcType=INTEGER}, #{fatherCode,jdbcType=INTEGER}, #{type,jdbcType=TINYINT},
+      #{name,jdbcType=VARCHAR}, #{fullName,jdbcType=VARCHAR}, #{sort,jdbcType=INTEGER}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="cn.gljp.sign.admin.entity.Region">
+        insert into base_region
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="code != null">
+                code,
+            </if>
+            <if test="fatherCode != null">
+                father_code,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="fullName != null">
+                full_name,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="code != null">
+                #{code,jdbcType=INTEGER},
+            </if>
+            <if test="fatherCode != null">
+                #{fatherCode,jdbcType=INTEGER},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=TINYINT},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="fullName != null">
+                #{fullName,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                #{sort,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="update" parameterType="cn.gljp.sign.admin.entity.Region">
+      update base_region
+      set 
+      father_code = #{fatherCode,jdbcType=INTEGER},
+      `type` = #{type,jdbcType=TINYINT},
+      `name` = #{name,jdbcType=VARCHAR},
+      full_name = #{fullName,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=INTEGER}
+      where code=#{code,jdbcType=INTEGER}
+    </update>
+    <delete id="delete" parameterType="cn.gljp.sign.admin.entity.Region">
+        delete from base_region
+        where code = #{code,jdbcType=INTEGER}
+    </delete>
+    <select id="listRegionByTypeAndFatherCode"  parameterType="java.util.HashMap" resultMap="BaseResultMap">
+       SELECT * from base_region where father_code=#{fatherCode,jdbcType=INTEGER} and `type` = #{type,jdbcType=TINYINT}
+       order by sort asc,code asc
+   </select>
+
+    <select id="getProvince" resultType="map">
+        select code, full_name fullName from base_region where type = 1 order by sort
+    </select>
+
+    <select id="getCity" parameterType="map" resultType="map">
+        select code, full_name fullName from base_region where type = 2 and father_code = #{code} order by sort
+    </select>
+
+    <select id="getArea" parameterType="map" resultType="map">
+        select code, full_name fullName from base_region where type = 3 and father_code = #{code} order by sort
+    </select>
+
+    <select id="getCodeByAllName" parameterType="String" resultType="String">
+        select code from base_region where full_name = #{arg2} and father_code = (
+        select code from base_region where full_name = #{arg1} and father_code = (
+        select code from base_region where full_name = #{arg0} ) )
+    </select>
+
+
+</mapper>

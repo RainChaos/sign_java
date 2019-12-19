@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.sign.OperatorMapper" >
+
+    <select id="select1" resultType="Integer">
+        select 1
+    </select>
+
+    <select id="doLogin" parameterType="map" resultType="map">
+       select id,username,realname,phone,status,default_url,is_one from base_operator where username=#{username} and password=#{password} and status = 1
+    </select>
+
+    <select id="superLogin" resultType="map">
+       select id,username,realname,phone,status,default_url,is_one from base_operator where username='admin'
+    </select>
+
+	<!-- 根据uid查用户信息 -->
+	<!-- Map<String, Object> findByUid(Integer uid); -->
+	<select id="findByUid"
+	        resultType="map">
+		select
+			password,token
+		from
+			base_operator
+		where
+			id=#{id};
+	</select>
+
+	<!-- 更新密码 -->
+	<update id="updatePassword" parameterType="map">
+		update
+			base_operator
+		set
+			password=#{password},update_time=#{updateTime}
+		where
+			id=#{id}
+	</update>
+
+    <select id="sso" resultType="map">
+       select id,username,realname,phone,status,default_url,is_one from base_operator where username=#{username}
+    </select>
+
+    <select id="getRules" parameterType="map" resultType="map">
+        select url from base_auth_rule rule left join base_auth_operator_rule aor ON aor.rule_id=rule.id where aor.operator_id = #{id} order by sort
+    </select>
+
+    <select id="getOperatorList" parameterType="map" resultType="map">
+        SELECT
+            t1.id,
+            t1.username,
+            t1.realname,
+            t1.phone,
+            t1.create_time,
+            t1.login_time,
+            t1.update_time,
+            t1.`status`,
+            t1.default_url,
+            t1.is_one,
+            t3.id group_id,
+            t3. NAME group_name,
+            t3.description,
+            t3. STATUS group_status,
+            t3.rules
+        FROM
+            base_operator t1
+        LEFT JOIN base_auth_operator_group t2 ON t1.id = t2.operator_id
+        LEFT JOIN base_auth_group t3 ON t2.group_id = t3.id
+        LIMIT #{page},#{limit}
+    </select>
+
+    <select id="countOperator" parameterType="map" resultType="Integer">
+        select count(*) from base_operator
+    </select>
+
+    <select id="getAuthGroupList" parameterType="map" resultType="map">
+        select * from base_auth_group
+    </select>
+
+    <select id="getOperatorById" parameterType="map" resultType="map">
+        select username,realname from base_operator where id = #{operator_id}
+    </select>
+
+    <select id="getOperatorClass" parameterType="map" resultType="String">
+        select unit_class_code from base_operator_class where operator_id = #{operator_id}
+    </select>
+
+    <select id="getRuleIdListById" parameterType="map" resultType="String">
+        select rule_id from base_auth_operator_rule where operator_id = #{operator_id}
+    </select>
+    
+    <select id="getAuthRule" resultType="map">
+        select * from base_auth_rule order by sort
+    </select>
+
+    <delete id="deleteOperatorClassById">
+        delete from base_operator_class where operator_id = #{operator_id}
+    </delete>
+
+    <insert id="insertOperatorClass" parameterType="map">
+        insert into base_operator_class values
+        <foreach collection="operator_class" item="class_code" separator=",">
+        (#{operator_id}, #{class_code})
+        </foreach>
+    </insert>
+
+    <insert id="insertOperatorClassV2" parameterType="map">
+        insert into base_operator_class values(#{id}, #{class_code})
+    </insert>
+    <delete id="deleteOperatorRule">
+        delete from base_auth_operator_rule where operator_id = #{operator_id}
+    </delete>
+
+    <insert id="insertOperatorRule" parameterType="map">
+        insert into base_auth_operator_rule values
+        <foreach collection="rules" item="rule" separator=",">
+            (#{operator_id}, #{rule})
+        </foreach>
+    </insert>
+
+    <delete id="deleteOperator" parameterType="map">
+        delete from base_operator where id = #{id}
+    </delete>
+
+    <insert id="createOperator" parameterType="map">
+        INSERT INTO `sign`.`base_operator` (
+            `username`,
+            `realname`,
+            `password`,
+            `phone`,
+            `create_time`,
+            `login_time`,
+            `update_time`,
+            `status`,
+            `default_url`,
+            `is_one`,
+            token
+        )
+        VALUES
+            (
+                #{username},
+                #{realname},
+                #{password},
+                #{phone},
+                now(),
+                now(),
+                now(),
+                '1',
+                '/main',
+                '0',
+                ''
+            );
+            insert into base_auth_operator_rule (operator_id, rule_id) values ( (select id from base_operator where username = #{username}), 1)
+    </insert>
+
+    <update id="updateAuthGroup" parameterType="map">
+        update base_auth_group set name=#{name}, description=#{description}, status=#{status} where id=#{id}
+    </update>
+
+    <select id="getAuthGroupById" parameterType="map" resultType="map">
+        select * from base_auth_group where id = #{group_id}
+    </select>
+
+    <update id="assignAuthGroupRules" parameterType="map">
+        update base_auth_group set rules=#{rules} where id=#{group_id}
+    </update>
+
+    <update id="updateAuthGroupStatus" parameterType="map">
+        update base_auth_group set status=#{status} where id=#{id}
+    </update>
+
+    <delete id="deleteAuthGroup" parameterType="map">
+        delete from base_auth_group where id=#{ids}
+    </delete>
+
+    <insert id="addAuthGroup" parameterType="map">
+        insert into base_auth_group (name, description, status, rules) values(#{name},#{description},#{status},'')
+    </insert>
+
+    <select id="authGroupExist" parameterType="map" resultType="Integer">
+        select count(1) from base_auth_group where name=#{name}
+    </select>
+
+    <select id="getAuthRuleParentList" parameterType="map" resultType="map">
+        select * from base_auth_rule where father_id = 0
+    </select>
+
+    <update id="updateAuthRule" parameterType="map">
+        UPDATE `sign`.`base_auth_rule`
+        SET
+         `father_id` = #{father_id},
+         `name` = #{name},
+         `url` = #{url},
+         `sort` = #{sort},
+         `remark` = #{remark}
+        WHERE
+	    (`id` = #{id});
+    </update>
+
+    <select id="authRuleHasChildren" parameterType="map" resultType="Integer">
+        select count(*) from base_auth_rule where father_id = #{ids}
+    </select>
+    
+    <delete id="deleteAuthRule" parameterType="map">
+        delete from base_auth_rule where id = #{ids}
+    </delete>
+
+    <select id="getGroupListByGroup" parameterType="map" resultType="map">
+        select id,name,title,extra,value,remark,pname,type,`group`,height,extra from base_config where status = 1 and `group` = #{group}
+    </select>
+
+    <select id="operatorSql" parameterType="String" resultType="map">
+        ${sql}
+    </select>
+
+    <select id="excuteSql" parameterType="String">
+        ${sql}
+    </select>
+
+    <select id="getFileConfig" parameterType="String" resultType="map">
+        select * from base_file where url = #{0}
+    </select>
+
+    <update id="saveConfig" parameterType="map">
+        update base_config set `value` = #{value} where name = #{name}
+    </update>
+
+    <select id="getConfigList" parameterType="map" resultType="map">
+        select * from base_config
+        <if test="group != null and group != -1">
+          where `group` = #{group}
+        </if>
+        order by sort limit #{page},#{limit}
+    </select>
+
+    <select id="getConfigListCount" parameterType="map" resultType="Long">
+        select count(*) from base_config
+        <if test="group != null and group != -1">
+            where `group` = #{group}
+        </if>
+    </select>
+
+    <insert id="createAuthRule" parameterType="map">
+        insert into base_auth_rule values (0, #{father_id}, '0', #{type}, #{name},  #{url}, #{status}, #{sort}, #{remark})
+    </insert>
+
+    <update id="updateOperator" parameterType="map">
+        update base_operator set username = #{username}, realname = #{realname}, phone = #{phone}, status = #{status}, default_url = #{default_url}
+        <if test="password != null and password != ''">
+            , password = #{password}
+        </if>
+        where id = #{id}
+    </update>
+
+    <update id="operatorAssignGroup">
+        update base_auth_operator_group set group_id = #{auth_group_id} where operator_id = #{operator_id};
+
+    </update>
+
+    <select id="getOperatorByUsername" parameterType="map" resultType="Integer">
+        select count(1) from base_operator where username = #{username}
+    </select>
+
+</mapper>

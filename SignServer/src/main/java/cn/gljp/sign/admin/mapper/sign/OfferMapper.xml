@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.sign.OfferMapper" >
+
+    <select id="getPrintTemplateList" parameterType="map" resultType="map">
+      select * from base_print_template limit #{page},#{limit}
+    </select>
+
+    <select id="getPrintTemplateCount" parameterType="map" resultType="Long">
+      select count(1) from base_print_template
+    </select>
+
+    <select id="getPrintTemplateById" parameterType="map" resultType="map">
+        select * from base_print_template where id = #{template_id}
+    </select>
+
+    <select id="getPrintAttr" resultType="map" parameterType="map">
+        select * from base_print_attribute
+        <if test="status != null and status != ''">
+            where status = #{status}
+        </if>
+    </select>
+
+    <update id="setIsPrint" parameterType="map">
+        update base_student set tzs_is_print = '1' where id = #{student_id}
+    </update>
+
+    <update id="updatePrintTemplate" parameterType="map">
+        UPDATE `sign`.`base_print_template`
+        SET
+         `template_name` = #{template_name},
+         `template_content` = #{template_content},
+         `sort` = #{sort},
+         `status` = #{status},
+         `type` = #{type}
+        WHERE
+          (`id` = #{id})
+    </update>
+
+    <insert id="createPrintTemplate" parameterType="map">
+        INSERT INTO `sign`.`base_print_template` (
+        `template_name`,
+        `template_content`,
+        `sort`,
+        `status`,
+        `type`
+        )
+        VALUES
+        (
+            #{template_name},
+            #{template_content},
+            #{sort},
+            #{status},
+            #{type}
+        );
+    </insert>
+
+    <delete id="deletePrintTemplate" parameterType="map">
+        delete from base_print_template where id = #{ids}
+    </delete>
+
+    <update id="updatePrintTemplateAttr" parameterType="map">
+        UPDATE `sign`.`base_print_attribute`
+        SET
+         `attribute_name` = #{attribute_name},
+         `opt_sql` = #{opt_sql},
+         `sort` = #{sort},
+         `status` = #{status},
+         `style` = #{style},
+         `barcode` = #{barcode}
+        WHERE
+            (`id` = #{id});
+    </update>
+
+    <delete id="deletePrintTemplateAttr" parameterType="map">
+        delete from base_print_attribute where id = #{ids}
+    </delete>
+
+    <insert id="createPrintTemplateAttr" parameterType="map">
+        INSERT INTO `sign`.`base_print_attribute` (
+            `attribute_name`,
+            `opt_sql`,
+            `sort`,
+            `status`
+        )
+        VALUES
+        (
+            #{attribute_name},
+            #{opt_sql},
+            #{sort},
+            #{status}
+        );
+    </insert>
+
+    <select id="getPrintBg" resultType="map">
+        select * from base_print_bg
+    </select>
+
+</mapper>

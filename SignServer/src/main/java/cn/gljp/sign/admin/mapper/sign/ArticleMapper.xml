@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.sign.ArticleMapper" >
+    <resultMap id="BaseResultMap" type="cn.gljp.sign.admin.entity.Article">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="title" jdbcType="VARCHAR" property="title" />
+        <result column="stitle" jdbcType="VARCHAR" property="stitle" />
+        <result column="thumb" jdbcType="VARCHAR" property="thumb" />
+        <result column="seo_keywords" jdbcType="VARCHAR" property="seoKeywords" />
+        <result column="seo_description" jdbcType="VARCHAR" property="seoDescription" />
+        <result column="cid" jdbcType="INTEGER" property="cid" />
+        <result column="is_trash" jdbcType="BIT" property="isTrash" />
+        <result column="status" jdbcType="BIT" property="status" />
+        <result column="publish_time" jdbcType="TIMESTAMP" property="publishTime" />
+        <result column="author" jdbcType="VARCHAR" property="author" />
+        <result column="sdate" jdbcType="INTEGER" property="sdate" />
+        <result column="edate" jdbcType="INTEGER" property="edate" />
+        <result column="sort" jdbcType="TINYINT" property="sort" />
+        <result column="visits" jdbcType="INTEGER" property="visits" />
+        <result column="top_time" jdbcType="TIMESTAMP" property="topTime" />
+        <result column="is_top" jdbcType="BIT" property="isTop" />
+        <result column="new_time" jdbcType="TIMESTAMP" property="newTime" />
+        <result column="name" jdbcType="VARCHAR" property="cateName" />
+        <result column="is_new" jdbcType="BIT" property="isNew" />
+        <result column="tuijian_time" jdbcType="TIMESTAMP" property="tuijianTime" />
+        <result column="is_tuijian" jdbcType="BIT" property="isTuijian" />
+        <result column="seo_title" jdbcType="VARCHAR" property="seoTitle" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    </resultMap>
+    <resultMap id="CategoryBaseResultMap" type="cn.gljp.sign.admin.entity.ArticleCategory">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="code" jdbcType="VARCHAR" property="code" />
+        <result column="sort" jdbcType="TINYINT" property="sort" />
+        <result column="father_id" jdbcType="INTEGER" property="fatherId" />
+        <result column="is_one" jdbcType="BIT" property="isOne" />
+        <result column="status" jdbcType="BIT" property="status" />
+        <result column="description" jdbcType="VARCHAR" property="description" />
+        <result column="seo_title" jdbcType="VARCHAR" property="seoTitle" />
+        <result column="seo_keywords" jdbcType="VARCHAR" property="seoKeywords" />
+        <result column="thumb" jdbcType="VARCHAR" property="thumb" />
+    </resultMap>
+    <!--======文章管理================================================================================================================================= -->
+    <select id="getArticleByTitle" parameterType="cn.gljp.sign.admin.entity.Article" resultMap="BaseResultMap">
+        select  *
+        from base_article
+        where title=#{title,jdbcType=VARCHAR}
+        order by sort asc,id asc
+    </select>
+    <select id="getOneArticle" parameterType="cn.gljp.sign.admin.entity.Article" resultMap="BaseResultMap">
+        select  *
+        from base_article
+        where id=#{id,jdbcType=INTEGER}
+        order by sort asc,id asc
+    </select>
+    <select id="listArticleCount"  resultType="Long">
+        select  count(*)
+        from base_article
+    </select>
+    <select id="getArticleList" parameterType="java.util.HashMap" resultMap="BaseResultMap">
+        select  *
+        from base_article a inner join base_article_category c on a.cid=c.id
+        order by a.sort asc,a.id asc
+        limit #{index},#{limit}
+    </select>
+    <insert id="insert" parameterType="cn.gljp.sign.admin.entity.Article">
+    insert into base_article ( title, stitle,
+      thumb, seo_keywords, seo_description,
+      cid, is_trash, status, publish_time,
+      author, sdate, edate,
+      sort, visits, top_time,
+      is_top, new_time, is_new, tuijian_time,
+      is_tuijian, seo_title, create_time,
+      update_time, content)
+    values ( #{title,jdbcType=VARCHAR}, #{stitle,jdbcType=VARCHAR},
+      #{thumb,jdbcType=VARCHAR}, #{seoKeywords,jdbcType=VARCHAR}, #{seoDescription,jdbcType=VARCHAR},
+      #{cid,jdbcType=INTEGER}, #{isTrash,jdbcType=BIT}, #{status,jdbcType=BIT}, #{publishTime,jdbcType=TIMESTAMP},
+      #{author,jdbcType=VARCHAR}, #{sdate,jdbcType=INTEGER}, #{edate,jdbcType=INTEGER},
+      #{sort,jdbcType=TINYINT}, #{visits,jdbcType=INTEGER}, #{topTime,jdbcType=TIMESTAMP},
+      #{isTop,jdbcType=BIT}, #{newTime,jdbcType=TIMESTAMP}, #{isNew,jdbcType=BIT}, #{tuijianTime,jdbcType=TIMESTAMP},
+      #{isTuijian,jdbcType=BIT}, #{seoTitle,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+      #{updateTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="cn.gljp.sign.admin.entity.Article">
+        insert into base_article
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="stitle != null">
+                stitle,
+            </if>
+            <if test="thumb != null">
+                thumb,
+            </if>
+            <if test="seoKeywords != null">
+                seo_keywords,
+            </if>
+            <if test="seoDescription != null">
+                seo_description,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="isTrash != null">
+                is_trash,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="publishTime != null">
+                publish_time,
+            </if>
+            <if test="author != null">
+                author,
+            </if>
+            <if test="sdate != null">
+                sdate,
+            </if>
+            <if test="edate != null">
+                edate,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+            <if test="visits != null">
+                visits,
+            </if>
+            <if test="topTime != null">
+                top_time,
+            </if>
+            <if test="isTop != null">
+                is_top,
+            </if>
+            <if test="newTime != null">
+                new_time,
+            </if>
+            <if test="isNew != null">
+                is_new,
+            </if>
+            <if test="tuijianTime != null">
+                tuijian_time,
+            </if>
+            <if test="isTuijian != null">
+                is_tuijian,
+            </if>
+            <if test="seoTitle != null">
+                seo_title,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="stitle != null">
+                #{stitle,jdbcType=VARCHAR},
+            </if>
+            <if test="thumb != null">
+                #{thumb,jdbcType=VARCHAR},
+            </if>
+            <if test="seoKeywords != null">
+                #{seoKeywords,jdbcType=VARCHAR},
+            </if>
+            <if test="seoDescription != null">
+                #{seoDescription,jdbcType=VARCHAR},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=INTEGER},
+            </if>
+            <if test="isTrash != null">
+                #{isTrash,jdbcType=BIT},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=BIT},
+            </if>
+            <if test="publishTime != null">
+                #{publishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="author != null">
+                #{author,jdbcType=VARCHAR},
+            </if>
+            <if test="sdate != null">
+                #{sdate,jdbcType=INTEGER},
+            </if>
+            <if test="edate != null">
+                #{edate,jdbcType=INTEGER},
+            </if>
+            <if test="sort != null">
+                #{sort,jdbcType=TINYINT},
+            </if>
+            <if test="visits != null">
+                #{visits,jdbcType=INTEGER},
+            </if>
+            <if test="topTime != null">
+                #{topTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isTop != null">
+                #{isTop,jdbcType=BIT},
+            </if>
+            <if test="newTime != null">
+                #{newTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isNew != null">
+                #{isNew,jdbcType=BIT},
+            </if>
+            <if test="tuijianTime != null">
+                #{tuijianTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isTuijian != null">
+                #{isTuijian,jdbcType=BIT},
+            </if>
+            <if test="seoTitle != null">
+                #{seoTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=LONGVARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="update" parameterType="cn.gljp.sign.admin.entity.Article">
+        update base_article
+        set 
+        title = #{title,jdbcType=VARCHAR},
+        stitle = #{stitle,jdbcType=VARCHAR},
+        thumb = #{thumb,jdbcType=VARCHAR},
+        seo_keywords = #{seoKeywords,jdbcType=VARCHAR},
+        seo_description = #{seoDescription,jdbcType=VARCHAR},
+        cid = #{cid,jdbcType=INTEGER},
+        is_trash = #{isTrash,jdbcType=BIT},
+        status = #{status,jdbcType=BIT},
+        publish_time = #{publishTime,jdbcType=TIMESTAMP},
+        author = #{author,jdbcType=VARCHAR},
+        sdate = #{sdate,jdbcType=INTEGER},
+        edate = #{edate,jdbcType=INTEGER},
+        sort = #{sort,jdbcType=TINYINT},
+        visits = #{visits,jdbcType=INTEGER},
+        top_time = #{topTime,jdbcType=TIMESTAMP},
+        is_top = #{isTop,jdbcType=BIT},
+        new_time = #{newTime,jdbcType=TIMESTAMP},
+        is_new = #{isNew,jdbcType=BIT},
+        tuijian_time = #{tuijianTime,jdbcType=TIMESTAMP},
+        is_tuijian = #{isTuijian,jdbcType=BIT},
+        seo_title = #{seoTitle,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where id=#{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateSelective" parameterType="cn.gljp.sign.admin.entity.Article">
+        update base_article
+        <set>
+            <if test="id != null">
+                id = #{id,jdbcType=INTEGER},
+            </if>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="stitle != null">
+                stitle = #{stitle,jdbcType=VARCHAR},
+            </if>
+            <if test="thumb != null">
+                thumb = #{thumb,jdbcType=VARCHAR},
+            </if>
+            <if test="seoKeywords != null">
+                seo_keywords = #{seoKeywords,jdbcType=VARCHAR},
+            </if>
+            <if test="seoDescription != null">
+                seo_description = #{seoDescription,jdbcType=VARCHAR},
+            </if>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=INTEGER},
+            </if>
+            <if test="isTrash != null">
+                is_trash = #{isTrash,jdbcType=BIT},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=BIT},
+            </if>
+            <if test="publishTime != null">
+                publish_time = #{publishTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="author != null">
+                author = #{author,jdbcType=VARCHAR},
+            </if>
+            <if test="sdate != null">
+                sdate = #{sdate,jdbcType=INTEGER},
+            </if>
+            <if test="edate != null">
+                edate = #{edate,jdbcType=INTEGER},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=TINYINT},
+            </if>
+            <if test="visits != null">
+                visits = #{visits,jdbcType=INTEGER},
+            </if>
+            <if test="topTime != null">
+                top_time = #{topTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isTop != null">
+                is_top = #{isTop,jdbcType=BIT},
+            </if>
+            <if test="newTime != null">
+                new_time = #{newTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isNew != null">
+                is_new = #{isNew,jdbcType=BIT},
+            </if>
+            <if test="tuijianTime != null">
+                tuijian_time = #{tuijianTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="isTuijian != null">
+                is_tuijian = #{isTuijian,jdbcType=BIT},
+            </if>
+            <if test="seoTitle != null">
+                seo_title = #{seoTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="content != null">
+                content = #{content,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id=#{id,jdbcType=INTEGER}
+    </update>
+    <delete id="delete" parameterType="cn.gljp.sign.admin.entity.Article">
+        delete from base_article
+        where id=#{id,jdbcType=INTEGER}
+    </delete>
+    <!--======文章分类================================================================================================================================= -->
+    <select id="getArticleCategoryTree" resultMap="CategoryBaseResultMap">
+        select  *
+        from base_article_category
+        order by sort asc,id asc
+    </select>
+    <select id="listArticleCategoryByFid" resultMap="CategoryBaseResultMap">
+        select  *
+        from base_article_category
+        where father_id=#{fatherId,jdbcType=INTEGER}
+        order by sort asc,id asc
+    </select>
+    <insert id="categoryInsert" parameterType="cn.gljp.sign.admin.entity.ArticleCategory">
+        insert into base_article_category ( `name`, code,
+          sort, father_id, is_one,
+          status, description, seo_title,
+          seo_keywords, thumb)
+        values ( #{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR},
+          #{sort,jdbcType=TINYINT}, #{fatherId,jdbcType=INTEGER}, #{isOne,jdbcType=BIT},
+          #{status,jdbcType=BIT}, #{description,jdbcType=VARCHAR}, #{seoTitle,jdbcType=VARCHAR},
+          #{seoKeywords,jdbcType=VARCHAR}, #{thumb,jdbcType=VARCHAR})
+  </insert>
+    <insert id="categoryInsertSelective" parameterType="cn.gljp.sign.admin.entity.ArticleCategory">
+        insert into base_article_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+            <if test="fatherId != null">
+                father_id,
+            </if>
+            <if test="isOne != null">
+                is_one,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="seoTitle != null">
+                seo_title,
+            </if>
+            <if test="seoKeywords != null">
+                seo_keywords,
+            </if>
+            <if test="thumb != null">
+                thumb,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                #{sort,jdbcType=TINYINT},
+            </if>
+            <if test="fatherId != null">
+                #{fatherId,jdbcType=INTEGER},
+            </if>
+            <if test="isOne != null">
+                #{isOne,jdbcType=BIT},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=BIT},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="seoTitle != null">
+                #{seoTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="seoKeywords != null">
+                #{seoKeywords,jdbcType=VARCHAR},
+            </if>
+            <if test="thumb != null">
+                #{thumb,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="categoryUpdate" parameterType="cn.gljp.sign.admin.entity.ArticleCategory">
+        update base_article_category
+      set
+      `name` = #{name,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      sort = #{sort,jdbcType=TINYINT},
+      father_id = #{fatherId,jdbcType=INTEGER},
+      is_one = #{isOne,jdbcType=BIT},
+      status = #{status,jdbcType=BIT},
+      description = #{description,jdbcType=VARCHAR},
+      seo_title = #{seoTitle,jdbcType=VARCHAR},
+      seo_keywords = #{seoKeywords,jdbcType=VARCHAR},
+      thumb = #{thumb,jdbcType=VARCHAR}
+      where id=#{id,jdbcType=INTEGER}
+    </update>
+    <update id="categoryUpdateBySelective" parameterType="cn.gljp.sign.admin.entity.ArticleCategory">
+        update base_article_category
+        <set>
+            <if test="id != null">
+                id = #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="sort != null">
+                sort = #{sort,jdbcType=TINYINT},
+            </if>
+            <if test="fatherId != null">
+                father_id = #{fatherId,jdbcType=INTEGER},
+            </if>
+            <if test="isOne != null">
+                is_one = #{isOne,jdbcType=BIT},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=BIT},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="seoTitle != null">
+                seo_title = #{seoTitle,jdbcType=VARCHAR},
+            </if>
+            <if test="seoKeywords != null">
+                seo_keywords = #{seoKeywords,jdbcType=VARCHAR},
+            </if>
+            <if test="thumb != null">
+                thumb = #{thumb,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id=#{id,jdbcType=INTEGER}
+    </update>
+    <delete id="categoryDelete" parameterType="cn.gljp.sign.admin.entity.ArticleCategory">
+        delete from base_article_category
+        where id=#{id,jdbcType=INTEGER}
+    </delete>
+</mapper>

@@ -1,0 +1,6 @@
+.el-form-item--small .el-form-item__error {
+    position: relative !important;
+}
+.el-upload__tip{
+    line-height: 20px !important;
+}

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.charge.SchoolStructureMapper" >
+    <select id="getSchoolStructureList" parameterType="map" resultType="map">
+        select *,ROW_NUMBER() OVER(ORDER BY id DESC) AS Row_Index from [dbo].[T_SCS_SchoolStructure]
+    </select>
+    <delete id="deleteChargeSchoolStructure" parameterType="map">
+        delete from [dbo].[T_SCS_SchoolStructure] where UnitID = #{unit_code}
+    </delete>
+    <delete id="deleteUnitChargeItem" parameterType="map">
+        delete from [dbo].T_SCS_UnitChargeItem where UnitID = #{unit_code}
+    </delete>
+    <select id="getClassCountByUnitID" parameterType="map" resultType="Integer">
+        select count(*) from [dbo].[T_SCS_Student]
+        where UnitCode = #{unit_code}
+    </select>
+    <insert id="addUnitChargeItem" parameterType="map" >
+      INSERT INTO [dbo].[T_SCS_UnitChargeItem]( [UnitID], [Number], [ItemID], [Standard], [Receivable], [Coverage])
+       VALUES (#{UnitID}, #{Number}, #{ItemID}, #{Standard}, #{Receivable}, #{Coverage});
+    </insert>
+    <update id="updateSchoolStructure" parameterType="map">
+        UPDATE [dbo].[T_SCS_SchoolStructure]
+        SET [UnitName] = #{unit_name},
+        [FartherID] = #{farther_code},
+        [UnitCode] =  #{unit_self_code},
+        [StudentType] =#{unit_type},
+        [ManageSystem] = #{unit_manage_system},
+        [EntranceData] = #{unit_entrance_date},
+        [StateData] = '1900-01-01 00:00:00.000',
+        [Stata] =  #{unit_status},
+        [CourseStandardID] = 1,
+        [TakeCourseLimit] = .00,
+        [Term] =  #{unit_term}
+        WHERE [UnitID] = #{unit_code}
+    </update>
+    <insert id="addSchoolStructure" parameterType="map" >
+        INSERT INTO [dbo].[T_SCS_SchoolStructure]([UnitID], [UnitName], [FartherID], [UnitCode], [StudentType], [ManageSystem], [EntranceData], [StateData], [Stata], [CourseStandardID], [TakeCourseLimit], [Term])
+        VALUES (#{unit_code}, #{unit_name}, #{farther_code}, #{unit_self_code},#{unit_type},#{unit_manage_system}, #{unit_entrance_date}, '1900-01-01 00:00:00.000', #{unit_status}, 1, .00, #{unit_term});
+    </insert>
+    <select id="queryUnitClass" parameterType="map" resultType="map">
+        select * from [dbo].[T_SCS_SchoolStructure]
+        where UnitID = #{unit_code}
+    </select>
+    <select id="getNextUnitCode" parameterType="java.util.HashMap" resultType="map">
+        SELECT top 1 * FROM [dbo].[T_SCS_SchoolStructure]
+        where FartherID =#{farther_code}
+        order by UnitID desc
+    </select>
+    <select id="getChildsCount" parameterType="java.util.HashMap" resultType="Integer">
+        SELECT count(*) FROM [dbo].[T_SCS_SchoolStructure]
+        where FartherID =#{farther_code}
+    </select>
+    <select id="getChargeItemListByUnitID" parameterType="java.util.HashMap" resultType="map">
+        SELECT * FROM [dbo].[T_SCS_UnitChargeItem]
+        where UnitID = #{UnitCode}
+        order by Number asc
+    </select>
+    <select id="getStuCountByUnitCode" parameterType="java.lang.String" resultType="map">
+        SELECT * FROM [dbo].[T_SCS_Student]
+        where SID like '${classCode}%'
+        order by studentid desc
+    </select>
+    <update id="updateUnitNameByUnitCode" parameterType="map">
+        update t_scs_schoolstructure set unitname = #{unit_name} where unitid = #{unit_code}
+    </update>
+
+    <update id="updateClassNameByClassCode" parameterType="map">
+        update t_scs_schoolstructure set unitname = #{unit_path} where unitid = #{class_code}
+    </update>
+
+</mapper>

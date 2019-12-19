@@ -1,0 +1,68 @@
+.main-page{
+    height:100%;
+    overflow: hidden;
+    background-image:url("../../static/mbg.png");
+    background-position: center 0;
+    background-repeat: no-repeat;
+    background-attachment:fixed;
+    background-size: cover;
+    -webkit-background-size: cover;/* 兼容Webkit内核浏览器如Chrome和Safari */
+    -o-background-size: cover;/* 兼容Opera */
+    zoom: 1;
+}
+.weui-btn + .weui-btn {
+    margin-top: 8px !important;
+}
+.form-content{
+    background-color:#FFF;
+    margin:0px 10px;
+    padding:0px 10px 20px 10px;
+    height: calc(100% - 80px);
+}
+.el-form-item--mini.el-form-item, .el-form-item--small.el-form-item {
+    margin-bottom: 0px !important;
+}
+
+#stepN .vux-step-item-title {
+    font-size: 12px !important;
+}
+#stepN .vux-step-item-head .vux-step-item-head-inner {
+    width: 15px !important;
+    height: 15px !important;
+    line-height: 15px !important;
+    font-size: 12px !important;
+}
+#stepN .vux-step-item-icon {
+    width: 15px !important;
+    height: 15px !important;
+}
+#stepN .weui-icon-success-no-circle {
+    font-size: 20px;
+    color: #09BB07;
+}
+.weixtishi{
+    color: #CE3C39;
+    background-color:#ececec;
+    padding:5px;
+    margin:0px -10px;
+    font-size:12px;
+    font-weight: bolder;
+}
+.studentInfo{
+    font-size:11px !important;
+}
+
+.sign-success{
+    margin:0px -10px;
+    padding:15px;
+    color:#FFF;
+    background-color: #09BB07;
+    font-size:18px;
+}
+.sign-not-success{
+    padding:15px;
+    margin:0px -10px;
+    color: #FFF;
+    background-color: #dd0000;
+    font-size:18px;
+}

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.sign.StatisticsMapper" >
+    <select id="getStudentCount" parameterType="map" resultType="map">
+        select * from (
+        (select count(1) StudentCount from base_student where pici_id = #{pici_id} ) StudentCount,
+        (select count(1) StudentPayCount from base_student where pici_id = #{pici_id} and is_pay = '是')StudentPayCount,
+        (select count(1) RegisterCount from base_student where pici_id = #{pici_id} and is_register = '是')RegisterCount,
+        (select count(1) RegisterNanCount from base_student where pici_id = #{pici_id} and is_register = '是' and sex = '男')RegisterNanCount,
+        (select count(1) RegisterNvCount from base_student where pici_id = #{pici_id} and is_register = '是' and sex = '女')RegisterNvCount )
+    </select>
+    <select id="getClassCount" parameterType="map" resultType="java.util.LinkedHashMap">
+        SELECT ( SELECT unit_name FROM base_school_structure WHERE unit_code = LEFT (class_code, 6) LIMIT 1 ) school, unit_name, class_code unit_code, ifnull( CONVERT (student_count, SIGNED), 0 ) student_count, ifnull( CONVERT (student_nan_count, SIGNED), 0 ) student_nan_count, ifnull( CONVERT (student_nv_count, SIGNED), 0 ) student_nv_count, ifnull( CONVERT (student_pay_count, SIGNED), 0 ) student_pay_count, ifnull( CONVERT ( student_nv_pay_count, SIGNED ), 0 ) student_nv_pay_count, ifnull( CONVERT ( student_nan_pay_count, SIGNED ), 0 ) student_nan_pay_count, ifnull( CONVERT ( student_register_count, SIGNED ), 0 ) student_register_count, ifnull( CONVERT ( student_nan_register_count, SIGNED ), 0 ) student_nan_register_count, ifnull( CONVERT ( student_nv_register_count, SIGNED ), 0 ) student_nv_register_count FROM ( SELECT ( SELECT unit_name FROM base_school_structure WHERE unit_code = class_code ) unit_name, a.* FROM ( SELECT t2.class_code, t1.student_count, t1.student_nan_count, t1.student_nv_count, t1.student_pay_count, t1.student_nv_pay_count, t1.student_nan_pay_count, t1.student_register_count, t1.student_nv_register_count, t1.student_nan_register_count FROM ( SELECT unit_code class_code, count(1) student_count, sum(CASE WHEN sex = '男' THEN 1 ELSE 0 END) student_nan_count, sum(CASE WHEN sex = '女' THEN 1 ELSE 0 END) student_nv_count, sum( CASE WHEN is_pay = '是' THEN 1 ELSE 0 END ) student_pay_count, sum( CASE WHEN sex = '男' AND is_pay = '是' THEN 1 ELSE 0 END ) student_nan_pay_count, sum( CASE WHEN sex = '女' AND is_pay = '是' THEN 1 ELSE 0 END ) student_nv_pay_count, sum( CASE WHEN is_register = '是' THEN 1 ELSE 0 END ) student_register_count, sum( CASE WHEN is_register = '是' AND sex = '男' THEN 1 ELSE 0 END ) student_nan_register_count, sum( CASE WHEN is_register = '是' AND sex = '女' THEN 1 ELSE 0 END ) student_nv_register_count FROM base_student WHERE pici_id = #{pici_id}
+GROUP BY unit_code ) t1 RIGHT JOIN base_select_unit_class t2 ON t1.class_code = t2.class_code WHERE t2.pici_id = #{pici_id}
+) a ) t ORDER BY student_count desc
+    </select>
+
+    <select id="getMajorCount" parameterType="map" resultType="java.util.LinkedHashMap">
+        SELECT ( SELECT unit_name FROM base_school_structure WHERE unit_code = LEFT (school, 6) LIMIT 1 ) school, unit_code, unit_name, ifnull( CONVERT (student_count, SIGNED), 0 ) student_count, ifnull( CONVERT (student_nan_count, SIGNED), 0 ) student_nan_count, ifnull( CONVERT (student_nv_count, SIGNED), 0 ) student_nv_count, ifnull( CONVERT (student_pay_count, SIGNED), 0 ) student_pay_count, ifnull( CONVERT ( student_nv_pay_count, SIGNED ), 0 ) student_nv_pay_count, ifnull( CONVERT ( student_nan_pay_count, SIGNED ), 0 ) student_nan_pay_count, ifnull( CONVERT ( student_register_count, SIGNED ), 0 ) student_register_count, ifnull( CONVERT ( student_nan_register_count, SIGNED ), 0 ) student_nan_register_count, ifnull( CONVERT ( student_nv_register_count, SIGNED ), 0 ) student_nv_register_count FROM ( SELECT unit_code school, unit_code, unit_name, student_count, student_nan_count, student_nv_count, student_pay_count, student_nv_pay_count, student_nan_pay_count, student_register_count, student_nv_register_count, student_nan_register_count FROM ( SELECT LEFT (unit_code, 12) major_code, count(1) student_count, sum(CASE WHEN sex = '男' THEN 1 ELSE 0 END) student_nan_count, sum(CASE WHEN sex = '女' THEN 1 ELSE 0 END) student_nv_count, sum( CASE WHEN is_pay = '是' THEN 1 ELSE 0 END ) student_pay_count, sum( CASE WHEN sex = '男' AND is_pay = '是' THEN 1 ELSE 0 END ) student_nan_pay_count, sum( CASE WHEN sex = '女' AND is_pay = '是' THEN 1 ELSE 0 END ) student_nv_pay_count, sum( CASE WHEN is_register = '是' THEN 1 ELSE 0 END ) student_register_count, sum( CASE WHEN is_register = '是' AND sex = '男' THEN 1 ELSE 0 END ) student_nan_register_count, sum( CASE WHEN is_register = '是' AND sex = '女' THEN 1 ELSE 0 END ) student_nv_register_count FROM base_student WHERE pici_id = #{pici_id} GROUP BY LEFT (unit_code, 12)) t1 RIGHT JOIN base_select_unit t2 ON t2.unit_code = t1.major_code WHERE pici_id = #{pici_id} ) t  ORDER BY student_count desc
+    </select>
+
+    <select id="getDeptCount" parameterType="map" resultType="java.util.LinkedHashMap">
+        SELECT ( SELECT unit_name FROM base_school_structure WHERE unit_code = LEFT (school, 6) LIMIT 1 ) school, unit_code, unit_name, ifnull( CONVERT (student_count, SIGNED), 0 ) student_count, ifnull( CONVERT (student_nan_count, SIGNED), 0 ) student_nan_count, ifnull( CONVERT (student_nv_count, SIGNED), 0 ) student_nv_count, ifnull( CONVERT (student_pay_count, SIGNED), 0 ) student_pay_count, ifnull( CONVERT ( student_nv_pay_count, SIGNED ), 0 ) student_nv_pay_count, ifnull( CONVERT ( student_nan_pay_count, SIGNED ), 0 ) student_nan_pay_count, ifnull( CONVERT ( student_register_count, SIGNED ), 0 ) student_register_count, ifnull( CONVERT ( student_nan_register_count, SIGNED ), 0 ) student_nan_register_count, ifnull( CONVERT ( student_nv_register_count, SIGNED ), 0 ) student_nv_register_count FROM ( SELECT t2.unit_code school, t2.unit_code, unit_name, student_count, student_nan_count, student_nv_count, student_pay_count, student_nv_pay_count, student_nan_pay_count, student_register_count, student_nv_register_count, student_nan_register_count FROM ( SELECT LEFT (unit_code, 9) major_code, count(1) student_count, sum(CASE WHEN sex = '男' THEN 1 ELSE 0 END) student_nan_count, sum(CASE WHEN sex = '女' THEN 1 ELSE 0 END) student_nv_count, sum( CASE WHEN is_pay = '是' THEN 1 ELSE 0 END ) student_pay_count, sum( CASE WHEN sex = '男' AND is_pay = '是' THEN 1 ELSE 0 END ) student_nan_pay_count, sum( CASE WHEN sex = '女' AND is_pay = '是' THEN 1 ELSE 0 END ) student_nv_pay_count, sum( CASE WHEN is_register = '是' THEN 1 ELSE 0 END ) student_register_count, sum( CASE WHEN is_register = '是' AND sex = '男' THEN 1 ELSE 0 END ) student_nan_register_count, sum( CASE WHEN is_register = '是' AND sex = '女' THEN 1 ELSE 0 END ) student_nv_register_count FROM base_student WHERE pici_id = #{pici_id}  GROUP BY LEFT (unit_code, 9)) t1 RIGHT JOIN ( SELECT DISTINCT LEFT (unit_code, 9) unit_code FROM base_select_unit ) t2 ON t2.unit_code = t1.major_code LEFT JOIN base_school_structure t3 ON t2.unit_code = t3.unit_code ) t ORDER BY student_count desc
+    </select>
+
+    <select id="getDataTypeIsSSQ" resultType="map">
+      select id,field_name,`describe` from base_student_field where data_type = '省市区'
+    </select>
+
+    <select id="getSSQCount" resultType="java.util.LinkedHashMap" parameterType="map">
+        select * from (
+            (select count(1) count from base_student where ${field_name} like concat(#{code},'%') and pici_id = #{pici_id}) count,
+            (select count(1) nan_count from base_student where ${field_name} like concat(#{code},'%') and pici_id = #{pici_id} and sex = '男') nan_count,
+            (select count(1) nv_count from base_student where ${field_name} like concat(#{code},'%') and pici_id = #{pici_id} and sex = '女') nv_count,
+            (select count(1) pay_count from base_student where ${field_name} like concat(#{code},'%') and pici_id = #{pici_id} and is_pay = '是') pay_count,
+            (select count(1) pay_nan_count from base_student where ${field_name} like concat(#{code},'%') and pici_id = #{pici_id} and sex = '男' and is_pay = '是') pay_nan_count,
+            (select count(1) pay_nv_count from base_student where ${field_name} like concat(#{code},'%') and pici_id = #{pici_id} and sex = '女' and is_pay = '是') pay_nv_count,
+            (select count(1) register_count from base_student where ${field_name} like concat(#{code},'%') and pici_id = #{pici_id} and is_register = '是') register_count,
+            (select count(1) register_nan_count from base_student where ${field_name} like concat(#{code},'%') and pici_id = #{pici_id} and sex = '男' and is_register = '是') register_nan_count,
+            (select count(1) register_nv_count from base_student where ${field_name} like concat(#{code},'%') and pici_id = #{pici_id} and sex = '女' and is_register = '是') register_nv_count )
+    </select>
+
+    <select id="getSSQEmptyCount" resultType="java.util.LinkedHashMap" parameterType="map">
+        select * from (
+        (select count(1) count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id}) count,
+        (select count(1) nan_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and sex = '男') nan_count,
+        (select count(1) nv_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and sex = '女') nv_count,
+        (select count(1) pay_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and is_pay = '是') pay_count,
+        (select count(1) pay_nan_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and sex = '男' and is_pay = '是') pay_nan_count,
+        (select count(1) pay_nv_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and sex = '女' and is_pay = '是') pay_nv_count,
+        (select count(1) register_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and is_register = '是') register_count,
+        (select count(1) register_nan_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and sex = '男' and is_register = '是') register_nan_count,
+        (select count(1) register_nv_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and sex = '女' and is_register = '是') register_nv_count )
+    </select>
+
+    <select id="getProvinceList" resultType="java.util.LinkedHashMap" parameterType="map">
+        select t1.*,t2.full_name provinceName from (
+        select left(${field_name}, 2) code,concat(left(${field_name}, 2),'0000') ${field_name}
+        from base_student where pici_id = #{pici_id} and ${field_name} is not null and ${field_name} &lt;&gt; '' GROUP BY  left(${field_name}, 2) ) t1
+        left join base_region t2 on t1.${field_name} = t2.code ORDER BY t2.sort
+    </select>
+
+    <select id="getCityList" resultType="java.util.LinkedHashMap" parameterType="map">
+        select t1.*,t2.full_name cityName, t3.full_name provinceName from (
+        select left(${field_name}, 4) code,concat(left(${field_name}, 4),'00') ${field_name}
+        from base_student where pici_id = #{pici_id} and ${field_name} is not null and ${field_name} &lt;&gt; '' GROUP BY  left(${field_name}, 4) ) t1
+        left join base_region t2 on t1.${field_name} = t2.code
+        LEFT JOIN base_region t3 on t2.father_code = t3.code ORDER BY t3.sort,t2.sort
+    </select>
+
+    <select id="getFieldNameList" parameterType="map" resultType="java.util.LinkedHashMap">
+        select ${field_name} from base_student where pici_id = #{pici_id} and ${field_name} is not null and ${field_name} &lt;&gt; '' GROUP BY ${field_name}
+    </select>
+
+    <select id="getFieldNameCount" resultType="java.util.LinkedHashMap" parameterType="map">
+        select * from (
+            (select count(1) count from base_student where ${field_name} = #{code} and pici_id = #{pici_id}) count,
+            (select count(1) nan_count from base_student where ${field_name} = #{code} and pici_id = #{pici_id} and sex = '男') nan_count,
+            (select count(1) nv_count from base_student where ${field_name} = #{code} and pici_id = #{pici_id} and sex = '女') nv_count,
+            (select count(1) pay_count from base_student where ${field_name} = #{code} and pici_id = #{pici_id} and is_pay = '是') pay_count,
+            (select count(1) pay_nan_count from base_student where ${field_name} = #{code} and pici_id = #{pici_id} and sex = '男' and is_pay = '是') pay_nan_count,
+            (select count(1) pay_nv_count from base_student where ${field_name} = #{code} and pici_id = #{pici_id} and sex = '女' and is_pay = '是') pay_nv_count,
+            (select count(1) register_count from base_student where ${field_name} = #{code} and pici_id = #{pici_id} and is_register = '是') register_count,
+            (select count(1) register_nan_count from base_student where ${field_name} = #{code} and pici_id = #{pici_id} and sex = '男' and is_register = '是') register_nan_count,
+            (select count(1) register_nv_count from base_student where ${field_name} = #{code} and pici_id = #{pici_id} and sex = '女' and is_register = '是') register_nv_count )
+    </select>
+
+
+    <select id="getFieldNameEmptyCount" resultType="java.util.LinkedHashMap" parameterType="map">
+        select * from (
+        (select count(1) count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id}) count,
+        (select count(1) nan_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and sex = '男') nan_count,
+        (select count(1) nv_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and sex = '女') nv_count,
+        (select count(1) pay_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and is_pay = '是') pay_count,
+        (select count(1) pay_nan_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and sex = '男' and is_pay = '是') pay_nan_count,
+        (select count(1) pay_nv_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and sex = '女' and is_pay = '是') pay_nv_count,
+        (select count(1) register_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and is_register = '是') register_count,
+        (select count(1) register_nan_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and sex = '男' and is_register = '是') register_nan_count,
+        (select count(1) register_nv_count from base_student where (${field_name} is null or ${field_name} = '') and pici_id = #{pici_id} and sex = '女' and is_register = '是') register_nv_count )
+    </select>
+
+    <select id="getFieldNameStatisticsConfig" resultType="java.util.LinkedHashMap">
+        select * from base_statistics_filed_name
+    </select>
+
+</mapper>

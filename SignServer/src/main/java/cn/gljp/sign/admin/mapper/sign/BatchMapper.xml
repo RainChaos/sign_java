@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.sign.BatchMapper" >
+    <select id="getPiciInfoById" parameterType="java.lang.String" resultType="map">
+        select *,case when start_time &lt; now() and end_time &gt; now() then 1
+        when start_time &gt; now() then 2
+        when end_time &lt; now() then 3
+        end baoming_status from base_student_pici
+        where id=#{id}
+    </select>
+    <select id="getBatch" parameterType="map" resultType="map">
+        select *,case when start_time &lt; now() and end_time &gt; now() then 1
+        when start_time &gt; now() then 2
+        when end_time &lt; now() then 3
+        end baoming_status from base_student_pici
+    </select>
+    <select id="getBatchV2" parameterType="map" resultType="map">
+        select *,case when start_time &lt; now() and end_time &gt; now() then 1
+        when start_time &gt; now() then 2
+        when end_time &lt; now() then 3
+        end baoming_status from base_student_pici
+        where `status`=1
+    </select>
+    <select id="getBatchCount" resultType="Integer">
+       select count(*) from base_student_pici
+    </select>
+    <select id="getBatchCountV2" resultType="Integer">
+       select count(*) from base_student_pici
+       where `status`=1
+    </select>
+    <update id="updateBatch" parameterType="map">
+        UPDATE `sign`.`base_student_pici`
+        SET
+         `name` = #{name},
+         `code` = #{code},
+         `is_end_charge` = #{is_end_charge},
+         `end_sign_remark` = #{end_sign_remark},
+         `start_time` = #{start_time},
+         `end_time` = #{end_time},
+         `end_charge_time` = #{end_charge_time},
+         `status` = #{status},
+         `sort` = #{sort},
+         `remark` = #{remark},
+         `update_time` = now()
+        WHERE
+          (`id` = #{id});
+    </update>
+
+
+    <insert id="createBatch" parameterType="map">
+        INSERT INTO `sign`.`base_student_pici` (
+            `name`,
+            `code`,
+            `is_end_charge`,
+            `end_sign_remark`,
+            `start_time`,
+            `end_time`,
+            `end_charge_time`,
+            `status`,
+            `sort`,
+            `remark`,
+            `create_time`,
+            `update_time`
+        )
+        VALUES
+            (
+                #{name},
+                #{code},
+                '0',
+                #{end_sign_remark},
+                #{start_time},
+                #{end_time},
+                #{end_charge_time},
+                '1',
+                #{sort},
+                #{remark},
+                now(),
+                now()
+            );
+    </insert>
+
+    <select id="currentBatchStudentCount" parameterType="map" resultType="Integer">
+        select count(1) from base_student where pici_id = #{ids}
+    </select>
+
+    <delete id="deleteBatch" parameterType="map">
+        delete from base_student_pici where id = #{ids}
+    </delete>
+
+</mapper>

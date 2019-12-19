@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.log.LogMapper" >
+
+    <select id="select1" resultType="Integer">
+        select 1
+    </select>
+
+    <select id="getActionLog" resultType="map" parameterType="map">
+        select t1.*,t2.realname  from base_action_log t1
+        left join sign.base_operator t2 on t1.username = t2.username
+        where 1
+        <if test="username != null and username != ''">
+            and (t1.username like concat('%', #{username}, '%')  or t2.realname  like concat('%', #{username}, '%'))
+        </if>
+        <if test="starttime != null and starttime != ''">
+            and t1.create_time &gt;= #{starttime}
+        </if>
+        <if test="endtime != null and endtime != ''">
+            and t1.create_time &lt;= #{endtime}
+        </if>
+        <if test="ip != null and ip != ''">
+            and t1.ip like concat('%', #{ip}, '%')
+        </if>
+        <if test="name != null and name != ''">
+            and t1.name like concat('%', #{name}, '%')
+        </if>
+        <if test="describe != null and describe != ''">
+            and t1.describe like concat('%', #{describe}, '%')
+        </if>
+        <if test="url != null and url != ''">
+            and t1.url like concat('%', #{url}, '%')
+        </if>
+        order by create_time desc
+        limit #{page},#{limit}
+    </select>
+
+    <select id="getActionLogCount" resultType="Long" parameterType="map">
+
+        select count(1) from (
+        select t1.*,t2.realname  from base_action_log t1
+        left join sign.base_operator t2 on t1.username = t2.username
+        where 1
+        <if test="username != null and username != ''">
+            and (t1.username like concat('%', #{username}, '%')  or t2.realname  like concat('%', #{username}, '%'))
+        </if>
+        <if test="starttime != null and starttime != ''">
+            and t1.create_time &gt;= #{starttime}
+        </if>
+        <if test="endtime != null and endtime != ''">
+            and t1.create_time &lt;= #{endtime}
+        </if>
+        <if test="ip != null and ip != ''">
+            and t1.ip like concat('%', #{ip}, '%')
+        </if>
+        <if test="name != null and name != ''">
+            and t1.name like concat('%', #{name}, '%')
+        </if>
+        <if test="describe != null and describe != ''">
+            and t1.describe like concat('%', #{describe}, '%')
+        </if>
+        <if test="url != null and url != ''">
+            and t1.url like concat('%', #{url}, '%')
+        </if>
+        )t
+
+    </select>
+
+    <insert id="addActionLog" parameterType="map">
+        insert into base_action_log values(
+        0,
+        #{username},
+        #{ip},
+        (select auth_rule_url_remark from sign.base_auth_rule_url where  auth_rule_url = #{url} LIMIT 0,1),
+        #{describe},
+        #{url},
+        '1',
+        now(),
+        now()
+        )
+    </insert>
+
+    <select id="getStudentLog" parameterType="map" resultType="map">
+        select t1.*,t2.realname from base_student_log t1 left join sign.base_operator t2 on t1.username = t2.username
+        where 1
+        <if test="username != null and username != ''">
+            and (t1.username like concat('%', #{username}, '%')  or t2.realname  like concat('%', #{username}, '%'))
+        </if>
+        <if test="starttime != null and starttime != ''">
+            and t1.create_time &gt;= #{starttime}
+        </if>
+        <if test="endtime != null and endtime != ''">
+            and t1.create_time &lt;= #{endtime}
+        </if>
+        <if test="ip != null and ip != ''">
+            and t1.ip like concat('%', #{ip}, '%')
+        </if>
+        <if test="name != null and name != ''">
+            and t1.name like concat('%', #{name}, '%')
+        </if>
+        <if test="describe != null and describe != ''">
+            and t1.describe like concat('%', #{describe}, '%')
+        </if>
+        <if test="url != null and url != ''">
+            and t1.url like concat('%', #{url}, '%')
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (t1.student_sno like concat('%', #{keyword}, '%')  or t1.student_name  like concat('%', #{keyword}, '%') or t1.student_idcode  like concat('%', #{keyword}, '%'))
+        </if>
+        order by create_time desc
+        limit #{page},#{limit}
+    </select>
+
+    <select id="getStudentLogCount" resultType="Long" parameterType="map">
+
+        select count(1) from (
+        select t1.*,t2.realname from base_student_log t1 left join sign.base_operator t2 on t1.username = t2.username
+        where 1
+        <if test="username != null and username != ''">
+            and (t1.username like concat('%', #{username}, '%')  or t2.realname  like concat('%', #{username}, '%'))
+        </if>
+        <if test="starttime != null and starttime != ''">
+            and t1.create_time &gt;= #{starttime}
+        </if>
+        <if test="endtime != null and endtime != ''">
+            and t1.create_time &lt;= #{endtime}
+        </if>
+        <if test="ip != null and ip != ''">
+            and t1.ip like concat('%', #{ip}, '%')
+        </if>
+        <if test="name != null and name != ''">
+            and t1.name like concat('%', #{name}, '%')
+        </if>
+        <if test="describe != null and describe != ''">
+            and t1.describe like concat('%', #{describe}, '%')
+        </if>
+        <if test="url != null and url != ''">
+            and t1.url like concat('%', #{url}, '%')
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (t1.student_sno like concat('%', #{keyword}, '%')  or t1.student_name  like concat('%', #{keyword}, '%') or t1.student_idcode  like concat('%', #{keyword}, '%'))
+        </if>
+        )t
+
+    </select>
+
+    <insert id="addStudentLog" parameterType="map">
+        insert into base_student_log values(
+        0,
+        #{username},
+        #{ip},
+        #{student_id},
+        #{student_name},
+        #{student_sno},
+        #{student_idcode},
+        #{old_data},
+        #{new_data},
+        (select auth_rule_url_remark from sign.base_auth_rule_url where  auth_rule_url = #{url} LIMIT 0,1),
+        #{describe},
+        #{url},
+        '1',
+        now(),
+        now()
+        )
+    </insert>
+
+
+</mapper>

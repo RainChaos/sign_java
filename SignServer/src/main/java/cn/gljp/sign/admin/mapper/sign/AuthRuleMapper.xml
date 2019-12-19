@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.sign.AuthRuleMapper" >
+    <select id="getAuthRuleByUrlAndOperatorId" parameterType="map" resultType="Integer">
+        select count(*) from v_auth_rule_url where url = #{url} and auth_rule_url like concat('%',#{authRuleUrl}) and operator_id = #{OperatorId}
+    </select>
+
+    <select id="getPhoneTeacherRuleId"  resultType="Integer">
+        select id from base_auth_rule where father_id = 999999
+    </select>
+
+    <select id="getPhoneTeacherAuthRuleUrlCount" resultType="Integer" parameterType="map">
+        select count(1) from base_auth_rule_url where auth_rule_url = #{url}
+    </select>
+
+    <select id="getPhoneTeacherRuleUrl" resultType="String">
+        select auth_rule_url from base_auth_rule_url where auth_rule_id = 999999
+    </select>
+
+    <select id="getAuthRuleInterfaceById" resultType="map" parameterType="map">
+        select * from base_auth_rule_url where auth_rule_id = #{id}
+    </select>
+
+    <insert id="addAuthRuleInterface" parameterType="map">
+        insert into base_auth_rule_url values (0, #{url}, #{remark}, #{id})
+    </insert>
+
+    <delete id="deleteAuthRuleInterface" parameterType="map">
+        delete from base_auth_rule_url where id = #{id}
+    </delete>
+
+    <update id="updateAuthRuleInterface" parameterType="map">
+        update base_auth_rule_url set auth_rule_url = #{url} , auth_rule_url_remark = #{remark} where id = #{id}
+    </update>
+</mapper>

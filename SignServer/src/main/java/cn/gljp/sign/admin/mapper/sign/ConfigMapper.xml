@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.sign.ConfigMapper" >
+    <resultMap id="BaseResultMap" type="cn.gljp.sign.admin.entity.BaseFile">
+        <result column="id" jdbcType="INTEGER" property="id" />
+        <result column="url" jdbcType="VARCHAR" property="url" />
+        <result column="name" jdbcType="VARCHAR" property="name" />
+        <result column="type" jdbcType="VARCHAR" property="type" />
+        <result column="size" jdbcType="VARCHAR" property="size" />
+        <result column="describe" jdbcType="VARCHAR" property="describe" />
+        <result column="status" jdbcType="BIT" property="status" />
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    </resultMap>
+    <select id="getQQ" resultType="map">
+       select * from qq_contact
+   </select>
+   <select id="getConfig" resultType="map">
+       select name,value from base_config order by sort
+   </select>
+    <select id="getWebSiteName" resultType="String">
+       select value from base_config
+       where name='WEB_SITE_NAME'
+       order by sort
+   </select>
+    <insert id="insertBaseFileSelective" parameterType="cn.gljp.sign.admin.entity.BaseFile">
+        insert into base_file
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="url != null">
+                url,
+            </if>
+            <if test="name != null">
+                `name`,
+            </if>
+            <if test="type != null">
+                `type`,
+            </if>
+            <if test="size != null">
+                `size`,
+            </if>
+            <if test="describe != null">
+                `describe`,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="url != null">
+                #{url,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="size != null">
+                #{size,jdbcType=VARCHAR},
+            </if>
+            <if test="describe != null">
+                #{describe,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=BIT},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="getConfigData" parameterType="map" resultType="map">
+      select * from base_config where id = #{id}
+    </select>
+
+    <update id="updateConfigData" parameterType="map">
+        UPDATE `base_config` SET `name`=#{name},
+        `type`=#{type}, `title`=#{title}, `group`=#{group}, `extra`=#{extra}, `remark`=#{remark}, `update_time`=now(), `status`=#{status}, `pname`=#{pname},
+        `value`=#{value}, `sort`=#{sort}, `height`=#{height} WHERE (`id`=#{id});
+
+    </update>
+
+    <insert id="createConfigData" parameterType="map">
+        INSERT INTO `sign`.`base_config` (
+        `id`,
+        `name`,
+        `type`,
+        `title`,
+        `group`,
+        `extra`,
+        `remark`,
+        `create_time`,
+        `update_time`,
+        `status`,
+        `pname`,
+        `value`,
+        `sort`,
+        `height`
+        )
+        VALUES
+        (
+		0,
+		#{name},
+		#{type},
+		#{title},
+		#{group},
+		#{extra},
+		#{remark},
+		now(),
+		now(),
+		#{status},
+		#{pname},
+		#{value},
+		#{sort},
+		#{height}
+	    );
+    </insert>
+
+    <delete id="deleteConfigData" parameterType="map">
+        delete from base_config where id = #{ids}
+    </delete>
+</mapper>

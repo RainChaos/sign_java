@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.charge.ChargeStudentMapper" >
+    <select id="deleteStudentInfo"  resultType="map">
+        DELETE FROM T_SCS_StudentChargeItemDetails WHERE ChargeItemID in ( select AutoID from T_SCS_StudentChargeItem where StudentID =#{student_id});
+        DELETE FROM T_SCS_StudentChargeDetail WHERE StudentID =#{student_id};
+        DELETE FROM T_SCS_B2C_Items WHERE Order_id in(select id from T_SCS_B2C_Order where StudentID=#{student_id});
+        DELETE FROM T_SCS_B2C_Order WHERE StudentID=#{student_id};
+        DELETE FROM T_SCS_StudentChargeItem WHERE StudentID=#{student_id};
+        DELETE FROM T_SCS_StudentSecurity WHERE StudentID=#{student_id};
+        DELETE FROM T_SCS_Student WHERE studentId=#{student_id};
+    </select>
+    <select id="getChargeItems"  resultType="map">
+        select * from T_SCS_ChargeItem
+        order by AutoID
+    </select>
+    <update id="modifyStudentClass" parameterType="java.util.HashMap">
+        update T_SCS_Student set UnitCode=#{targetClass} where StudentID=#{student_id}
+    </update>
+    <select id="getStudentChargeItems" parameterType="java.util.HashMap" resultType="map">
+        select t1.*,t2.ItemName from T_SCS_StudentChargeItem t1
+        inner join T_SCS_ChargeItem t2 on t1.ItemID=t2.AutoID
+        WHERE StudentID=#{student_id}
+        ORDER BY Num
+    </select>
+    <update id="editChargeStudentInfo" parameterType="java.util.HashMap">
+        update T_SCS_Student set
+        <foreach collection="map" index="key" item="value" separator=",">
+            <if test="value !=null">
+                ${key}=#{value }
+            </if>
+        </foreach>
+        where StudentID=#{studentid}
+    </update>
+    <insert id="addStudentChargeItem" parameterType="java.util.HashMap">
+        insert into T_SCS_StudentChargeItem
+        <foreach collection="map" index="key" item="value"
+                 open="(" close=")" separator=",">
+            <if test="value !=null">
+                ${key}
+            </if>
+        </foreach>
+        values
+        <foreach collection="map" index="key" item="value"
+                 open="(" close=")" separator=",">
+            <if test="value !=null  ">
+                #{value}
+            </if>
+        </foreach>
+    </insert>
+    <select id="getChargeItemByID" parameterType="java.lang.String" resultType="map">
+        select * from T_SCS_ChargeItem
+        where AutoID=#{itemID}
+    </select>
+    <insert id="addChargeStudentInfo" parameterType="java.util.HashMap" useGeneratedKeys="true" keyProperty="map.StudentID">
+        insert into T_SCS_Student
+        <foreach collection="map" index="key" item="value"
+                 open="(" close=")" separator=",">
+            <if test="value !=null and value !='' ">
+                ${key}
+            </if>
+        </foreach>
+        values
+        <foreach collection="map" index="key" item="value"
+                 open="(" close=")" separator=",">
+            <if test="value !=null and value !='' ">
+                #{value}
+            </if>
+        </foreach>
+    </insert>
+
+    <select id="getStudentChargeById" parameterType="String" resultType="map">
+        SELECT
+            t1.StudentID,
+                t1.ItemID,
+                t2.ItemName,
+                SUM(t1.ReceivableMoney) AS ReceivableMoney,
+                SUM(t1.PayMoney) AS PayMoney
+            FROM
+                T_SCS_StudentChargeItem t1
+            LEFT JOIN T_SCS_ChargeItem t2 ON t1.ItemID = t2.AutoID
+            WHERE
+                t1.StudentID in(${ids})
+            GROUP BY
+                t1.ItemID,
+            t1.StudentID,
+                t2.ItemName
+            ORDER BY
+                t1.StudentID
+    </select>
+
+
+
+</mapper>

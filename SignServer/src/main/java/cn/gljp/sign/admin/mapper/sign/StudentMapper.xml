@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.sign.StudentMapper" >
+    <delete id="deleteStudentInfo" parameterType="java.util.HashMap">
+        delete from base_student  where id=#{student_id}
+    </delete>
+    <update id="changeStudentStatus" parameterType="java.util.HashMap">
+        update base_student set status=#{status},remark=#{remark} where id=#{student_id}
+    </update>
+    <update id="setRegister" parameterType="java.util.HashMap">
+        update base_student set is_register=#{is_register} where id=#{student_id}
+    </update>
+    <update id="modifyStudentClass" parameterType="java.util.HashMap">
+        update base_student set unit_code=#{targetClass},zbyy=#{zbyy} where id=#{student_id}
+    </update>
+    <update id="changeUnitCodeByID" parameterType="java.util.HashMap">
+        update base_student set unit_code=#{unit_code} where id=#{id}
+    </update>
+    <select id="getLdybzCount" parameterType="map" resultType="java.lang.Integer">
+        select count(*) from base_student
+        where unit_code like '${unit_code}%' and is_ldybz=1 and pici_id=#{pici_id}
+    </select>
+
+    <update id="editSignStudentInfo" parameterType="java.util.HashMap">
+     update  base_student set
+    <foreach collection="map" index="key" item="value" separator=",">
+        <if test="value !=null ">
+            ${key}=#{value}
+        </if>
+    </foreach>
+     where id=#{map.id}
+    </update>
+
+    <update id="deleteStuImage" parameterType="java.util.HashMap">
+        update base_student set ${field_name}=null where ${field_name}=#{url}
+    </update>
+
+    <select id="isHaveStudent" parameterType="map" resultType="java.lang.Integer">
+        select count(*) from base_student
+        <where>
+        <foreach collection="map" index="key" item="value"
+                 open="(" close=")"      separator=" or ">
+            <if test="value !=null and key !='sno' ">
+                ${key}=#{value}
+            </if>
+        </foreach>
+        <foreach collection="map" index="key" item="value">
+            <if test="value !=null and key =='sno' ">
+              and  ${key} != #{value}
+            </if>
+        </foreach>
+        </where>
+    </select>
+    <select id="getUnitqueFieldList" parameterType="java.util.HashMap" resultType="java.lang.String">
+        select field_name from base_student_field
+        where is_unique=1  and field_name in
+        <foreach collection="map" index="key" item="value"
+                 open="(" close=")" separator=",">
+            <if test="value !=null and value !='' ">
+                #{key}
+            </if>
+        </foreach>
+    </select>
+    <insert id="addSignStudentInfo" parameterType="java.util.HashMap">
+        insert into base_student
+        <foreach collection="map" index="key" item="value"
+                 open="(" close=")" separator=",">
+            <if test="value !=null ">
+                ${key}
+            </if>
+        </foreach>
+        values
+        <foreach collection="map" index="key" item="value"
+                 open="(" close=")" separator=",">
+            <if test="value !=null ">
+                #{value}
+            </if>
+        </foreach>
+    </insert>
+    <select id="getStudentListBySearch" parameterType="map" resultType="java.util.LinkedHashMap">
+        select id,sex,unit_code,is_ldybz from base_student  where pici_id = #{pici_id}
+        and unit_code like '${nianji_code}%'
+        <if test="is_pay != '全部' ">
+            and is_pay=#{is_pay}
+        </if>
+         order by create_time desc
+    </select>
+    <select id="getStudentList" parameterType="map" resultType="java.util.LinkedHashMap">
+        select ${fieldList},(select class_teacher from base_select_unit_class where class_code=stu.unit_code) as class_teacher,
+        (select teacher_phone from base_select_unit_class where class_code=stu.unit_code) as teacher_phone from base_student stu
+        where pici_id = #{pici_id}
+        and unit_code in (${clazzStr})
+        <if test="unit_code != null and unit_code != ''">
+            and unit_code like concat(#{unit_code},'%')
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (idcode=#{keyword} or `name`=#{keyword} or sno=#{keyword})
+        </if>
+        <if test="condition != null and condition != ''">
+            and ${condition}
+        </if> order by create_time desc
+        limit #{page},#{limit}
+    </select>
+
+    <select id="getStudentListCount" parameterType="map" resultType="Long">
+        select count(*) from base_student stu where pici_id = #{pici_id}
+        and unit_code in (${clazzStr})
+        <if test="unit_code != null and unit_code != ''">
+            and unit_code like concat(#{unit_code},'%')
+        </if>
+        <if test="condition != null and condition != ''">
+            and ${condition}
+        </if>
+    </select>
+
+    <select id="stuInfoConvert" parameterType="map" resultType="String">
+        SELECT
+            CASE data_type
+        WHEN '省市区' THEN
+            (select GROUP_CONCAT(full_name SEPARATOR '>') from (
+                select full_name from base_region where code = CONCAT(left(#{value},2),'0000') UNION
+                select full_name from base_region where code = CONCAT(left(#{value},4),'00') UNION
+                select full_name from base_region where code = #{value}
+                ) region )
+        WHEN '单位结构' THEN
+            (select GROUP_CONCAT(unit_name SEPARATOR '>') from (
+                select unit_name from base_school_structure where unit_code = left(#{value},9) UNION
+                select unit_name from base_school_structure where unit_code = left(#{value},12) UNION
+                select unit_name from base_school_structure where unit_code = #{value}
+                ) major)
+        else
+        (
+          select name from base_dictionary where type = #{data_type} and code = #{value}
+        )
+        END as value
+        FROM
+            base_student_field
+        WHERE
+            field_name = #{key}
+    </select>
+
+    <select id="getStudentField" parameterType="map" resultType="map">
+        select field_name from base_student_form_field where form_name = #{form_name} order by sort asc
+    </select>
+
+    <select id="getStudentInfoById" parameterType="map" resultType="map">
+        select * from base_student where id=#{id} or id=#{student_id} or id = #{ids}
+    </select>
+    <select id="getStudentInfoBySno" parameterType="map" resultType="map">
+        select * from base_student where sno = #{sno}
+    </select>
+    <select id="searchStudentInfo" parameterType="map" resultType="map">
+        select * from base_student where `name` = #{name} and idcode=#{idcode}
+    </select>
+
+    <select id="getSnoById" resultType="String">
+        select sno from base_student where id in
+        <foreach collection="array" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <update id="setStudentDorm" parameterType="map">
+        update base_student set dor_status = #{dor_status}, dor_path = #{dor_path}, dor_bed_number = #{dor_bed_number} where sno = #{sid}
+    </update>
+
+</mapper>

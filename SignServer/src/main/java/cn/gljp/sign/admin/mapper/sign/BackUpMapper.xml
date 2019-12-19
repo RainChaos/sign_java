@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.sign.BackUpMapper" >
+
+    <insert id="add" parameterType="map">
+        insert into base_backup values(0, #{name}, now())
+    </insert>
+
+    <select id="getBackUp" parameterType="map" resultType="map">
+        select * from base_backup order by `id` desc limit #{page},#{limit}
+    </select>
+
+    <select id="getBackUpCount" parameterType="map" resultType="Long">
+        select count(1) from base_backup
+    </select>
+
+    <select id="select1" resultType="Integer">
+        select 1
+    </select>
+</mapper>

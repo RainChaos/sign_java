@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.gljp.sign.admin.mapper.sign.SchoolMapper" >
+
+    <update id="updateStudentByUnitCode" parameterType="map">
+        update base_student set unit_code=#{unit_code}
+        where unit_code=#{unit_code_update}
+    </update>
+    <update id="updateSelectUnitClassBySelfCode" parameterType="map">
+        update base_select_unit_class set class_code=#{unit_code}
+        where unit_self_code=#{unit_self_code}
+    </update>
+    <update id="updateSelectUnitBySelfCode" parameterType="map">
+        update base_select_unit set unit_code=#{unit_code}
+        where unit_self_code=#{unit_self_code}
+    </update>
+    <delete id="deleteSchoolStructure" parameterType="map">
+        delete from base_school_structure where unit_code = #{unit_code}
+    </delete>
+    <update id="updateSchoolStructure" parameterType="map">
+        update base_school_structure
+        <set>
+
+            <if test="unit_self_code != null">
+                unit_self_code = #{unit_self_code ,jdbcType=VARCHAR},
+            </if>
+            <if test="farther_code != null">
+                farther_code = #{farther_code ,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_name != null">
+                unit_name = #{unit_name,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_type != null">
+                unit_type = #{unit_type,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_manage_system != null">
+                unit_manage_system = #{unit_manage_system,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_entrance_date != null">
+                unit_entrance_date = #{unit_entrance_date,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_term != null">
+                unit_term = #{unit_term,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_status != null">
+                unit_status = #{unit_status,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_sort != null">
+                unit_sort = #{unit_sort,jdbcType=INTEGER},
+            </if>
+            <if test=" create_time != null">
+                create_time = #{create_time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="update_time != null">
+                update_time = #{update_time,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where unit_code = #{unit_code,jdbcType=VARCHAR}
+    </update>
+    <update id="updateSchoolStructure2" parameterType="map">
+        update base_school_structure
+        <set>
+
+            <if test="unit_code != null">
+                unit_code = #{unit_code ,jdbcType=VARCHAR},
+            </if>
+            <if test="farther_code != null">
+                farther_code = #{farther_code ,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_name != null">
+                unit_name = #{unit_name,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_type != null">
+                unit_type = #{unit_type,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_manage_system != null">
+                unit_manage_system = #{unit_manage_system,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_entrance_date != null">
+                unit_entrance_date = #{unit_entrance_date,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_term != null">
+                unit_term = #{unit_term,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_status != null">
+                unit_status = #{unit_status,jdbcType=VARCHAR},
+            </if>
+            <if test="unit_sort != null">
+                unit_sort = #{unit_sort,jdbcType=INTEGER},
+            </if>
+            <if test=" create_time != null">
+                create_time = #{create_time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="update_time != null">
+                update_time = #{update_time,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where unit_self_code = #{unit_self_code,jdbcType=VARCHAR}
+    </update>
+    <insert id="addSchoolStructure" parameterType="map" >
+        INSERT INTO `sign`.`base_school_structure`(`unit_code`, `unit_self_code`, `farther_code`, `unit_name`, `unit_type`, `unit_manage_system`, `unit_entrance_date`, `unit_term`, `unit_status`, `unit_sort`, `create_time`, `update_time`)
+        VALUES (#{unit_code}, #{unit_self_code}, #{farther_code}, #{unit_name}, #{unit_type},#{unit_manage_system},#{unit_entrance_date},#{unit_term},#{unit_status},#{unit_sort},#{create_time},#{update_time})
+    </insert>
+    <select id="getClassListByNID" parameterType="java.lang.String" resultType="map">
+        select t1.unit_code as unitid,t1.unit_name as unitname from base_school_structure t1 inner join base_select_unit_class t2 on t1.unit_code=t2.class_code
+        where unit_code like '%${nid}%'
+    </select>
+    <select id="getClassUnitItemByNID" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT  unit_term   FROM `base_school_structure`
+        where  farther_code=#{nid} and unit_term &lt;&gt; ''
+        limit 1
+    </select>
+    <select id="getUnitCodeByID" parameterType="java.util.HashMap" resultType="java.lang.String">
+        select left(unit_code,15) as UnitCode from base_student where id=#{student_id}
+    </select>
+    <select id="getStudentCountByClassCode" parameterType="java.util.HashMap" resultType="Integer">
+       select count(*) from base_student
+        where unit_code=#{classCode}
+        <if test="type != 0 and type != null">
+            and sex = #{classCode}
+        </if>
+    </select>
+    <select id="getClassListByMajor" parameterType="java.util.HashMap" resultType="map">
+       select * from base_select_unit_class
+        where pici_id=#{pici_id}
+        and   select_unit_id=#{id}
+        and `status`=1
+        order by sort,id
+    </select>
+    <select id="isHaveGrade" parameterType="java.util.HashMap" resultType="map">
+        SELECT * from base_school_structure
+         where length(unit_code)=#{gradeLength}
+         and unit_code like '${unitCode}%'
+         and unit_name=#{currentGrade}
+    </select>
+    <select id="getUnitByUnitCode" parameterType="java.lang.String" resultType="map">
+        SELECT * from base_select_unit
+         where unit_code=#{unit_code}
+    </select>
+    <select id="getSelectDept" parameterType="map" resultType="map">
+        SELECT * from base_school_structure
+         where unit_code in (SELECT left(unit_code,9) FROM `base_select_unit`
+        where pici_id = 4 and education like '%${education}%'
+        and `status`=1 and student_open=1
+        GROUP BY left(unit_code,9))
+    </select>
+    <select id="getSelectUnitList" parameterType="map" resultType="map">
+        select * from base_select_unit
+        where pici_id = 4 and education like '%${education}%'
+        and `status`=1 and student_open=1
+        ORDER BY sort,id
+    </select>
+
+   <!--<select id="getSchoolStructure" parameterType="map" resultType="map">-->
+       <!--select t1.*,t2.sort,t2.pici_id from base_school_structure t1  LEFT JOIN base_select_unit t2 on t1.unit_code = t2.unit_code-->
+       <!--where farther_code = #{farther_code}-->
+       <!--<if test="current_grade != null and current_grade != ''">-->
+           <!--and unit_name = #{current_grade}-->
+       <!--</if>-->
+       <!--<if test="farther_code.length==9 and allIn == null">-->
+           <!--and t2.pici_id = #{pici_id}-->
+       <!--</if>-->
+       <!--ORDER BY sort,unit_sort-->
+   <!--</select>-->
+
+    <select id="getSchoolStructure" parameterType="map" resultType="map">
+        select t1.* from base_school_structure t1
+        where farther_code = #{farther_code}
+        <if test="current_grade != null and current_grade != ''">
+            and unit_name = #{current_grade}
+        </if>
+        ORDER BY unit_sort
+    </select>
+
+    <select id="getSchoolStructure2" parameterType="map" resultType="map">
+        select t1.* from base_school_structure t1
+        where farther_code = #{farther_code}
+        <if test="current_grade != null and current_grade != ''">
+            and unit_name = #{current_grade}
+        </if>
+        ORDER BY unit_sort
+    </select>
+
+    <select id="getMajorExtendField" parameterType="map" resultType="map">
+        select * from base_select_unit where unit_code = #{unit_code} and pici_id = #{pici_id}
+        <if test="operator_open != null and operator != ''">
+            and operator_open = #{operator_open}
+        </if>
+        <if test="student_open != null and student_open != ''">
+            and student_open = #{student_open}
+        </if>
+    </select>
+
+    <select id="getSelectUnitClass" parameterType="map" resultType="map">
+        SELECT
+            *, (
+                SELECT
+                    unit_name
+                FROM
+                    base_school_structure
+                WHERE
+                    unit_code = LEFT (t2.class_code, 15)
+            ) grade,
+            (SELECT
+            unit_name
+            FROM
+            base_school_structure
+            WHERE
+            unit_code = LEFT (t2.class_code, 12)
+            ) major,
+            (
+            select count(1) from base_student where unit_code = t2.class_code
+            ) existTotalStudent
+        FROM
+            base_school_structure t1
+        LEFT JOIN base_select_unit_class t2 ON t1.unit_code = t2.class_code
+        WHERE
+            LENGTH(unit_code) = 18
+        AND t2.pici_id = #{pici_id}
+        <if test="select_unit_ids != null and select_unit_ids != ''">
+            and t2.select_unit_id in (${select_unit_ids})
+        </if>
+        ORDER BY
+            t1.farther_code,sort asc
+    </select>
+
+    <select id="getSelectUnitCount" parameterType="map" resultType="Integer">
+        select count(*) from base_select_unit where education like '%${education}%'
+        and pici_id = #{pici_id}
+    </select>
+    <select id="queryMajor" parameterType="map" resultType="map">
+        select * from base_school_structure where unit_code = #{unit_code}
+    </select>
+    <select id="queryMajor2" parameterType="map" resultType="map">
+        select  * from base_school_structure where unit_self_code = #{unit_self_code} limit 1
+    </select>
+    <select id="queryUnitClass" parameterType="map" resultType="map">
+        select t1.*,t2.unit_name from base_select_unit_class t1
+        inner join base_school_structure t2 on t1.class_code=t2.unit_code
+        where class_code = #{unit_code} and pici_id = #{pici_id}
+    </select>
+    <select id="queryUnitClassV2" parameterType="map" resultType="map">
+       select * from base_school_structure where unit_code = #{unit_code}
+    </select>
+    <select id="queryUnitClassV3" parameterType="map" resultType="map">
+        select t1.*,t2.unit_name,t2.unit_code from base_select_unit_class t1
+        right join base_school_structure t2 on t1.class_code=t2.unit_code
+        where t2.farther_code = #{nianjiCode} and t2.unit_name=#{banjiName}
+    </select>
+    <select id="queryUnitMajor" parameterType="map" resultType="map">
+        select * from base_select_unit where unit_code = #{unit_code} and pici_id = #{pici_id}
+    </select>
+    <insert id="addUnitMajor" parameterType="map" >
+        INSERT INTO `sign`.`base_select_unit` (
+            `pici_id`,
+            `unit_code`,
+            `is_ldybz`,
+            `ldybz_number`,
+            `unit_name`,
+            `status`,
+            `student_open`,
+            `operator_open`,
+            `is_auto_add_class`,
+            `sort`,
+            `remark`,
+            `create_time`,
+            `unit_self_code`
+        )
+        VALUES
+            (
+              #{pici_id},
+              #{unit_code},
+              '0',
+              '0',
+              #{unit_name},
+              '1',
+              '1',
+              '1',
+              '0',
+              '1',
+              '',
+              now(),
+              #{unit_self_code}
+            );
+    </insert>
+
+    <delete id="deleteUnitMajor" parameterType="map">
+        delete from base_select_unit where pici_id = #{pici_id} and unit_code = #{unit_code}
+    </delete>
+
+    <select id="unitHasStudent" parameterType="map" resultType="Integer">
+        select count(1) from base_student where unit_code like concat(#{unit_code}, '%') and pici_id = #{pici_id}
+    </select>
+
+    <update id="updateUnitMajor" parameterType="map">
+        update base_select_unit set
+            xuezhi = #{xuezhi},
+            is_ldybz = #{is_ldybz},
+            ldybz_number = #{ldybz_number},
+            unit_name = #{unit_name},
+            status = #{status},
+            student_open = #{student_open},
+            operator_open = #{operator_open},
+            is_auto_add_class = #{is_auto_add_class},
+            sort = #{sort},
+            remark = #{remark},
+            update_time = now(),
+            education = #{education}
+        where pici_id = #{pici_id} and unit_code = #{unit_code};
+        update base_school_structure set unit_name = #{unit_name} where unit_code = #{unit_code};
+
+    </update>
+
+    <update id="updateUnitClass" parameterType="map">
+        UPDATE `sign`.`base_select_unit_class`
+            SET
+             `status` = #{status},
+             `class_teacher` = #{class_teacher},
+             `teacher_phone` = #{teacher_phone},
+             `number` = #{number},
+             `nan_number` = #{nan_number},
+             `nv_number` = #{nv_number},
+             `sort` = #{sort},
+             `student_open` = #{student_open},
+             `operator_open` = #{operator_open},
+             `is_can_charge` = #{is_can_charge},
+             `remark` = #{remark},
+             `update_time` = now(),
+             `is_ldybz` = #{is_ldybz}
+        WHERE
+              pici_id = #{pici_id} and class_code = #{class_code};
+        update base_school_structure set unit_name = #{unit_path} where unit_code = #{class_code};
+    </update>
+
+    <delete id="deleteSelectUnitClass" parameterType="map">
+        delete from base_select_unit_class where id in (${ids})
+    </delete>
+
+    <select id="getClassLists" parameterType="map" resultType="map">
+        select
+        *
+        from base_school_structure where farther_code = (
+        select unit_code from base_school_structure where unit_code like '${unit_code}%' and unit_name = (select value from base_config where name = 'CURRENT_GRADE')
+        )
+    </select>
+
+    <insert id="createSelectUnitClass" parameterType="map">
+        INSERT INTO `sign`.`base_select_unit_class` (
+        `pici_id`,
+        `select_unit_id`,
+        `class_code`,
+        `status`,
+        `class_teacher`,
+        `teacher_phone`,
+        `number`,
+        `nan_number`,
+        `nv_number`,
+        `sort`,
+        `student_open`,
+        `operator_open`,
+        `is_can_charge`,
+        `remark`,
+        `create_time`,
+        `unit_self_code`
+        )
+        VALUES
+        (
+        #{pici_id},
+        #{select_unit_id},
+        #{unit_code},
+        '1',
+        '',
+        '',
+        '50',
+        '50',
+        '50',
+        '1',
+        '1',
+        '1',
+        '1',
+        '',
+        now(),
+        #{unit_self_code}
+        )
+    </insert>
+
+    <select id="classExist" parameterType="map" resultType="Integer">
+        select count(*) from base_select_unit_class where class_code = #{unit_code} and pici_id = #{pici_id}
+    </select>
+
+    <delete id="deleteSelectUnitClassWhenDeleteSelectUnit" parameterType="map">
+        delete from base_select_unit_class where pici_id = #{pici_id} and class_code like "%"#{unit_code,jdbcType=VARCHAR}"%"
+    </delete>
+
+    <select id="classHasStudent" parameterType="map" resultType="Integer">
+        select count(1) from base_student where unit_code = (select class_code from base_select_unit_class where id = #{ids})
+    </select>
+
+    <delete id="deleteSelectUnit" parameterType="map">
+        delete from base_select_unit where id = #{ids}
+    </delete>
+
+    <select id="unitHasStudentV2" parameterType="map" resultType="Integer">
+        select count(1) from base_student where unit_code like concat((select unit_code from base_select_unit where id = #{ids}), '%')
+        and pici_id = (select pici_id from base_select_unit where id = #{ids})
+    </select>
+
+    <delete id="deleteSelectUnitClassV2" parameterType="map">
+        delete from base_select_unit_class where id in(
+        select a.id from (
+        select id from base_select_unit_class where pici_id = (select pici_id from base_select_unit where id = #{ids})
+        and class_code like concat((select unit_code from base_select_unit where id = #{ids}), '%')
+        )a
+        )
+    </delete>
+    <delete id="deleteSelectUnitClassByUnitID" parameterType="map">
+        delete from base_select_unit_class
+        where class_code=#{unit_code}
+    </delete>
+
+    <select id="getMajorCodeByName" parameterType="String" resultType="String">
+        select unit_code from base_select_unit where unit_name = #{0}
+    </select>
+</mapper>
